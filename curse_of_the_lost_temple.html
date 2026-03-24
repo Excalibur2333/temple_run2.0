@@ -1,0 +1,1518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Curse of the Lost Temple</title>
+  <style>
+    :root{
+      --bg:#120f0c;
+      --panel:#211a15;
+      --panel-2:#2d241d;
+      --gold:#d8b46a;
+      --sand:#9f8351;
+      --ivy:#50743d;
+      --lava:#ff6b2f;
+      --sky:#2a221a;
+      --text:#f4e3bf;
+      --muted:#c5b28d;
+      --accent:#72d39a;
+      --danger:#ff7a70;
+      --pixel-shadow: 0 4px 0 rgba(0,0,0,.35);
+      --border-dark:#6f5731;
+      --border-light:#f0d08a;
+      --maxw:1180px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:"Trebuchet MS", Verdana, sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at 20% 15%, rgba(216,180,106,.08), transparent 18%),
+        radial-gradient(circle at 80% 10%, rgba(114,211,154,.08), transparent 14%),
+        radial-gradient(circle at 50% 85%, rgba(255,107,47,.08), transparent 20%),
+        linear-gradient(180deg, #17120e 0%, #0f0b09 100%);
+      overflow-x:hidden;
+    }
+
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      opacity:.22;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.03) 50%, transparent 50%),
+        linear-gradient(rgba(255,255,255,.02) 50%, transparent 50%);
+      background-size:8px 8px, 8px 8px;
+      mix-blend-mode:overlay;
+    }
+
+    .page{
+      width:min(var(--maxw), calc(100% - 32px));
+      margin:0 auto;
+      padding:24px 0 32px;
+      position:relative;
+    }
+
+    .hero{
+      display:grid;
+      grid-template-columns:1.15fr .85fr;
+      gap:22px;
+      align-items:stretch;
+      margin-bottom:22px;
+    }
+
+    .panel{
+      position:relative;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.03), transparent 40%),
+        linear-gradient(180deg, var(--panel-2), var(--panel));
+      border:3px solid var(--border-dark);
+      outline:2px solid rgba(240,208,138,.18);
+      box-shadow:var(--pixel-shadow), inset 0 0 0 2px rgba(255,255,255,.03);
+      overflow:hidden;
+    }
+
+    .panel::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.04), transparent 30%),
+        radial-gradient(circle at 85% 18%, rgba(216,180,106,.08), transparent 18%);
+    }
+
+    .hero-copy{
+      padding:28px 26px 24px;
+      min-height:280px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+    }
+
+    .eyebrow{
+      display:inline-block;
+      align-self:flex-start;
+      padding:6px 10px;
+      margin-bottom:14px;
+      font-size:12px;
+      letter-spacing:2px;
+      text-transform:uppercase;
+      color:#1b170f;
+      background:linear-gradient(180deg, #f2d58f, #c89b52);
+      border:2px solid #7a5827;
+      box-shadow:var(--pixel-shadow);
+    }
+
+    h1{
+      margin:0 0 10px;
+      font-size:clamp(2rem, 4.5vw, 4rem);
+      line-height:.95;
+      letter-spacing:1px;
+      text-transform:uppercase;
+      text-shadow:4px 4px 0 rgba(0,0,0,.35);
+    }
+
+    .title-accent{color:var(--gold)}
+    .lead{
+      margin:0 0 18px;
+      max-width:62ch;
+      color:var(--muted);
+      font-size:1rem;
+      line-height:1.6;
+    }
+
+    .hero-actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-top:8px;
+    }
+
+    .pixel-btn{
+      appearance:none;
+      border:0;
+      cursor:pointer;
+      padding:12px 18px;
+      color:#1b160f;
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:1px;
+      background:linear-gradient(180deg, #f8e0a2, #c99948);
+      border:3px solid #765220;
+      box-shadow:0 5px 0 #4d3515;
+      transition:transform .08s ease, filter .15s ease;
+    }
+    .pixel-btn.alt{
+      color:var(--text);
+      background:linear-gradient(180deg, #3f5c35, #263820);
+      border-color:#10170d;
+      box-shadow:0 5px 0 #121a0f;
+    }
+    .pixel-btn.ghost{
+      color:var(--text);
+      background:linear-gradient(180deg, #443126, #2c211b);
+      border-color:#110d0b;
+      box-shadow:0 5px 0 #15100d;
+    }
+    .pixel-btn:hover{filter:brightness(1.05)}
+    .pixel-btn:active{transform:translateY(3px); box-shadow:0 2px 0 rgba(0,0,0,.45)}
+    .pixel-btn:focus-visible{outline:3px solid var(--accent); outline-offset:3px}
+
+    .hero-card{
+      padding:18px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      min-height:280px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.1)),
+        linear-gradient(180deg, #2e261f, #19130f);
+    }
+
+    .mini-scene{
+      position:relative;
+      height:180px;
+      border:3px solid #5a4529;
+      background:
+        radial-gradient(circle at 70% 18%, rgba(250,222,150,.15), transparent 18%),
+        linear-gradient(180deg, #2d3b2b 0%, #1e2618 30%, #3a2518 31%, #28180e 100%);
+      overflow:hidden;
+    }
+
+    .sun, .vine, .column, .torch, .gem{
+      position:absolute;
+      image-rendering:pixelated;
+    }
+    .sun{
+      width:62px;height:62px; right:16px; top:14px;
+      background:
+        linear-gradient(90deg, transparent 30%, rgba(255,255,255,.2) 30% 35%, transparent 35% 65%, rgba(255,255,255,.2) 65% 70%, transparent 70%),
+        linear-gradient(transparent 30%, rgba(255,255,255,.2) 30% 35%, transparent 35% 65%, rgba(255,255,255,.2) 65% 70%, transparent 70%),
+        #e5b962;
+      box-shadow:0 0 0 6px rgba(229,185,98,.15);
+    }
+    .vine{
+      width:10px; top:-10px; bottom:42px;
+      background:
+        repeating-linear-gradient(180deg, #446137 0 8px, #39552d 8px 16px);
+    }
+    .vine.v1{left:18px}
+    .vine.v2{left:62px}
+    .vine.v3{right:78px}
+    .column{
+      bottom:24px; width:42px; height:92px;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.08), transparent 28%, rgba(0,0,0,.18) 72%),
+        repeating-linear-gradient(180deg, #8b7047 0 10px, #7d643d 10px 20px);
+      border:3px solid #564123;
+    }
+    .column.c1{left:34px}
+    .column.c2{left:96px; height:74px}
+    .column.c3{right:52px}
+    .torch{
+      width:16px;height:38px; bottom:70px;
+      background:linear-gradient(180deg, #6f4f28, #392814);
+      border:2px solid #1a120c;
+    }
+    .torch::before{
+      content:"";
+      position:absolute;
+      top:-12px; left:1px; right:1px; height:16px;
+      background:
+        linear-gradient(180deg, #ffe59a, #ff8d33 55%, #ad330f);
+      clip-path:polygon(50% 0%, 100% 60%, 70% 100%, 30% 100%, 0% 60%);
+      filter:drop-shadow(0 0 8px rgba(255,140,51,.45));
+    }
+    .torch.t1{left:152px}
+    .torch.t2{right:130px}
+    .gem{
+      width:18px;height:18px;
+      background:#63d7d0;
+      transform:rotate(45deg);
+      box-shadow:0 0 0 3px rgba(99,215,208,.15);
+    }
+    .gem.g1{left:210px; top:76px}
+    .gem.g2{right:104px; top:92px}
+    .ground-band{
+      position:absolute; left:0; right:0; bottom:0; height:26px;
+      background:
+        repeating-linear-gradient(90deg, #5e442a 0 16px, #714f2f 16px 32px),
+        linear-gradient(180deg, #7b5b32, #4d351e);
+      border-top:3px solid #2b1d10;
+    }
+
+    .card-stats{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:10px;
+      margin-top:14px;
+    }
+    .stat{
+      padding:10px 10px 12px;
+      background:rgba(0,0,0,.18);
+      border:2px solid rgba(240,208,138,.18);
+      text-align:center;
+    }
+    .stat strong{
+      display:block;
+      font-size:1.2rem;
+      color:var(--gold);
+      margin-bottom:2px;
+    }
+    .stat span{
+      font-size:.8rem;
+      color:var(--muted);
+      letter-spacing:.6px;
+      text-transform:uppercase;
+    }
+
+    .lower{
+      display:grid;
+      grid-template-columns:280px 1fr;
+      gap:22px;
+      align-items:start;
+    }
+
+    .sidebar{
+      display:grid;
+      gap:18px;
+    }
+
+    .info-card{padding:18px}
+    .info-card h2{
+      margin:0 0 12px;
+      font-size:1.05rem;
+      text-transform:uppercase;
+      letter-spacing:1px;
+      color:var(--gold);
+    }
+    .info-card p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.55;
+      font-size:.95rem;
+    }
+    .control-list{
+      display:grid;
+      gap:10px;
+      margin-top:8px;
+    }
+    .control{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      padding:10px;
+      background:rgba(0,0,0,.16);
+      border:2px solid rgba(240,208,138,.12);
+    }
+    .keycap{
+      min-width:74px;
+      text-align:center;
+      padding:8px 10px;
+      color:#1b150d;
+      background:linear-gradient(180deg, #f1ddb1, #c3a16f);
+      border:2px solid #715631;
+      box-shadow:0 3px 0 #50391d;
+      font-weight:800;
+      font-size:.8rem;
+      letter-spacing:.7px;
+      text-transform:uppercase;
+    }
+    .control span{
+      color:var(--muted);
+      font-size:.92rem;
+      line-height:1.35;
+    }
+
+    .game-shell{
+      padding:18px;
+    }
+
+    .hud-top{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:center;
+      flex-wrap:wrap;
+      margin-bottom:12px;
+    }
+    .hud-strip{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    .badge{
+      padding:8px 10px;
+      background:linear-gradient(180deg, #31261f, #211812);
+      border:2px solid #5f4728;
+      color:var(--text);
+      font-size:.82rem;
+      letter-spacing:.8px;
+      text-transform:uppercase;
+      box-shadow:var(--pixel-shadow);
+    }
+    .badge strong{color:var(--gold)}
+
+    .progress-wrap{
+      margin-bottom:12px;
+      padding:10px;
+      background:rgba(0,0,0,.18);
+      border:2px solid rgba(240,208,138,.12);
+    }
+    .progress-head{
+      display:flex;
+      justify-content:space-between;
+      margin-bottom:8px;
+      font-size:.8rem;
+      letter-spacing:1px;
+      text-transform:uppercase;
+      color:var(--muted);
+    }
+    .progress-bar{
+      position:relative;
+      height:18px;
+      background:#1a130f;
+      border:2px solid #4f3b23;
+      overflow:hidden;
+    }
+    .progress-fill{
+      height:100%;
+      width:0%;
+      background:
+        repeating-linear-gradient(90deg, rgba(255,255,255,.12) 0 12px, transparent 12px 24px),
+        linear-gradient(90deg, #d7b66c, #f1e4a9);
+      transition:width .2s linear;
+    }
+
+    .canvas-frame{
+      position:relative;
+      padding:14px;
+      background:
+        linear-gradient(180deg, #3a2d21, #231913);
+      border:4px solid #7e6137;
+      outline:2px solid rgba(240,208,138,.16);
+      box-shadow:var(--pixel-shadow);
+    }
+
+    canvas{
+      display:block;
+      width:100%;
+      max-width:100%;
+      height:auto;
+      border:4px solid #281d13;
+      background:#1d1913;
+      image-rendering:pixelated;
+      image-rendering:crisp-edges;
+    }
+
+    .overlay-ui{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      margin-top:12px;
+      flex-wrap:wrap;
+    }
+
+    .footer{
+      margin-top:22px;
+      padding:14px 18px;
+      text-align:center;
+      color:#ab9671;
+      font-size:.9rem;
+      letter-spacing:.5px;
+    }
+
+    .screen{
+      position:absolute;
+      inset:14px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      padding:24px;
+      background:rgba(13,10,8,.68);
+      backdrop-filter:blur(2px);
+      z-index:3;
+    }
+    .screen.hidden{display:none}
+    .screen-card{
+      width:min(580px, 100%);
+      padding:22px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.03), transparent 28%),
+        linear-gradient(180deg, #32261d, #1d1510);
+      border:4px solid #826137;
+      outline:2px solid rgba(240,208,138,.16);
+      box-shadow:0 10px 0 rgba(0,0,0,.4);
+    }
+    .screen-card h3{
+      margin:0 0 10px;
+      font-size:clamp(1.4rem, 2vw, 2rem);
+      text-transform:uppercase;
+      letter-spacing:1px;
+      color:var(--gold);
+    }
+    .screen-card p{
+      margin:0 auto 14px;
+      max-width:46ch;
+      color:var(--muted);
+      line-height:1.55;
+    }
+    .screen-card .small{
+      font-size:.9rem;
+      color:#cfbc97;
+    }
+    .screen-actions{
+      display:flex;
+      gap:10px;
+      justify-content:center;
+      flex-wrap:wrap;
+      margin-top:16px;
+    }
+
+    .stage-list{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:8px;
+      margin:14px 0 4px;
+      text-align:left;
+    }
+    .stage-item{
+      padding:8px 10px;
+      background:rgba(0,0,0,.18);
+      border:2px solid rgba(240,208,138,.14);
+      color:var(--muted);
+      font-size:.92rem;
+    }
+
+    @media (max-width: 980px){
+      .hero,.lower{grid-template-columns:1fr}
+      .hero-card{min-height:unset}
+    }
+
+    @media (max-width: 640px){
+      .page{width:min(100% - 18px, var(--maxw)); padding-top:14px}
+      .hero-copy,.hero-card,.game-shell,.info-card{padding:14px}
+      .screen{inset:10px}
+      .stage-list{grid-template-columns:1fr}
+      h1{font-size:2.3rem}
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <section class="hero">
+      <div class="panel hero-copy">
+        <div class="eyebrow">Retro Web Game Project</div>
+        <h1>Curse of the <span class="title-accent">Lost Temple</span></h1>
+        <p class="lead">
+          Sprint through a shattered jungle sanctuary, vault spike pits, slide beneath fallen stone, and outrun the collapse of a forgotten ruin. This original pixel-inspired runner blends arcade reflexes with a polished temple adventure presentation.
+        </p>
+        <div class="hero-actions">
+          <button class="pixel-btn" id="heroStartBtn">Start Expedition</button>
+          <button class="pixel-btn alt" id="heroPauseBtn">Pause / Resume</button>
+          <button class="pixel-btn ghost" id="heroRestartBtn">Restart Run</button>
+        </div>
+      </div>
+
+      <div class="panel hero-card">
+        <div class="mini-scene" aria-hidden="true">
+          <div class="sun"></div>
+          <div class="vine v1"></div>
+          <div class="vine v2"></div>
+          <div class="vine v3"></div>
+          <div class="column c1"></div>
+          <div class="column c2"></div>
+          <div class="column c3"></div>
+          <div class="torch t1"></div>
+          <div class="torch t2"></div>
+          <div class="gem g1"></div>
+          <div class="gem g2"></div>
+          <div class="ground-band"></div>
+        </div>
+        <div class="card-stats">
+          <div class="stat"><strong>4</strong><span>Distinct Stages</span></div>
+          <div class="stat"><strong>2D</strong><span>Canvas Runner</span></div>
+          <div class="stat"><strong>Retro</strong><span>Pixel Style</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lower">
+      <aside class="sidebar">
+        <div class="panel info-card">
+          <h2>Game Brief</h2>
+          <p>
+            You are a relic hunter fleeing the wrath of an awakened temple. Survive four escalating stages, collect relic shards for score, protect your three lives, and endure the final collapse countdown to escape with the treasure.
+          </p>
+        </div>
+
+        <div class="panel info-card">
+          <h2>Controls</h2>
+          <div class="control-list">
+            <div class="control"><div class="keycap">Space</div><span>Jump over pits, traps, cracked tiles, and rolling hazards.</span></div>
+            <div class="control"><div class="keycap">Arrow Down</div><span>Duck and slide under broken pillars and low fireballs.</span></div>
+            <div class="control"><div class="keycap">P</div><span>Pause or resume the expedition at any time.</span></div>
+            <div class="control"><div class="keycap">R</div><span>Restart the run from Stage 1.</span></div>
+          </div>
+        </div>
+
+        <div class="panel info-card">
+          <h2>Stage Route</h2>
+          <div class="stage-list">
+            <div class="stage-item">Stage 1: Jungle Gate</div>
+            <div class="stage-item">Stage 2: Broken Causeway</div>
+            <div class="stage-item">Stage 3: Lava Hall</div>
+            <div class="stage-item">Final Challenge: Temple Collapse Escape</div>
+          </div>
+        </div>
+      </aside>
+
+      <main class="panel game-shell">
+        <div class="hud-top">
+          <div class="hud-strip">
+            <div class="badge">Stage <strong id="stageLabel">Jungle Gate</strong></div>
+            <div class="badge">Lives <strong id="livesLabel">3</strong></div>
+            <div class="badge">Score <strong id="scoreLabel">0</strong></div>
+            <div class="badge">Distance <strong id="distanceLabel">0m</strong></div>
+            <div class="badge">Shards <strong id="shardLabel">0</strong></div>
+          </div>
+          <div class="hud-strip">
+            <button class="pixel-btn alt" id="pauseBtn">Pause</button>
+            <button class="pixel-btn ghost" id="restartBtn">Restart</button>
+          </div>
+        </div>
+
+        <div class="progress-wrap">
+          <div class="progress-head">
+            <span id="progressText">Expedition Progress</span>
+            <span id="statusText">Ready</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+        </div>
+
+        <div class="canvas-frame">
+          <canvas id="gameCanvas" width="960" height="540"></canvas>
+
+          <div class="screen" id="startScreen">
+            <div class="screen-card">
+              <h3>Enter the Lost Temple</h3>
+              <p>
+                Dash through ancient ruins, avoid deadly hazards, and survive all four stages. The final escape becomes a countdown sprint through a collapsing corridor.
+              </p>
+              <p class="small">
+                Press <strong>Space</strong> to jump, <strong>Arrow Down</strong> to duck, <strong>P</strong> to pause, and <strong>R</strong> to restart.
+              </p>
+              <div class="screen-actions">
+                <button class="pixel-btn" id="startBtn">Start Expedition</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="screen hidden" id="pauseScreen">
+            <div class="screen-card">
+              <h3>Expedition Paused</h3>
+              <p>Take a breath. The temple is still waiting.</p>
+              <div class="screen-actions">
+                <button class="pixel-btn alt" id="resumeBtn">Resume</button>
+                <button class="pixel-btn ghost" id="pauseRestartBtn">Restart</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="screen hidden" id="winScreen">
+            <div class="screen-card">
+              <h3>Temple Escaped</h3>
+              <p id="winSummary">You escaped the collapse with your relic haul intact.</p>
+              <div class="screen-actions">
+                <button class="pixel-btn" id="winRestartBtn">Play Again</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="screen hidden" id="loseScreen">
+            <div class="screen-card">
+              <h3>Run Ended</h3>
+              <p id="loseSummary">The curse reclaimed the temple runner.</p>
+              <div class="screen-actions">
+                <button class="pixel-btn" id="loseRestartBtn">Retry Expedition</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="overlay-ui">
+          <div class="badge">Hazards: pillars, spikes, fireballs, cracked tiles, rolling stone</div>
+          <div class="badge">Final Mode: collapse countdown + dense hazards</div>
+        </div>
+      </main>
+    </section>
+
+    <footer class="panel footer">
+      Developed by Ember Glyph Studio with the Temple Systems Class Team.
+    </footer>
+  </div>
+
+  <script>
+    (() => {
+      const canvas = document.getElementById("gameCanvas");
+      const ctx = canvas.getContext("2d");
+
+      const ui = {
+        stageLabel: document.getElementById("stageLabel"),
+        livesLabel: document.getElementById("livesLabel"),
+        scoreLabel: document.getElementById("scoreLabel"),
+        distanceLabel: document.getElementById("distanceLabel"),
+        shardLabel: document.getElementById("shardLabel"),
+        progressFill: document.getElementById("progressFill"),
+        progressText: document.getElementById("progressText"),
+        statusText: document.getElementById("statusText"),
+        startScreen: document.getElementById("startScreen"),
+        pauseScreen: document.getElementById("pauseScreen"),
+        winScreen: document.getElementById("winScreen"),
+        loseScreen: document.getElementById("loseScreen"),
+        winSummary: document.getElementById("winSummary"),
+        loseSummary: document.getElementById("loseSummary")
+      };
+
+      const stageDefs = [
+        {
+          name: "Jungle Gate",
+          length: 1500,
+          speed: 290,
+          bg: { sky: "#30442d", mid: "#476039", far: "#263821", ground: "#6d4e2d", accent: "#8bd278" },
+          spawnBase: 1.25,
+          obstacleWeights: ["spike", "pillar", "tile"],
+          fireballChance: 0.10,
+          rollingChance: 0.08,
+          particleColor: "rgba(139,210,120,0.35)"
+        },
+        {
+          name: "Broken Causeway",
+          length: 1800,
+          speed: 340,
+          bg: { sky: "#3c352c", mid: "#65533b", far: "#2d241c", ground: "#7a6842", accent: "#d9c289" },
+          spawnBase: 1.00,
+          obstacleWeights: ["pillar", "tile", "spike", "rolling"],
+          fireballChance: 0.18,
+          rollingChance: 0.25,
+          particleColor: "rgba(217,194,137,0.30)"
+        },
+        {
+          name: "Lava Hall",
+          length: 2100,
+          speed: 390,
+          bg: { sky: "#391816", mid: "#5e241a", far: "#24110e", ground: "#4f2b1c", accent: "#ff9d5c" },
+          spawnBase: 0.85,
+          obstacleWeights: ["spike", "fireball", "tile", "rolling", "pillar"],
+          fireballChance: 0.38,
+          rollingChance: 0.28,
+          particleColor: "rgba(255,157,92,0.42)"
+        },
+        {
+          name: "Temple Collapse Escape",
+          length: 2400,
+          speed: 450,
+          bg: { sky: "#291310", mid: "#56302a", far: "#1a0d0c", ground: "#6b3b24", accent: "#ffd07a" },
+          spawnBase: 0.65,
+          obstacleWeights: ["fireball", "rolling", "spike", "tile", "pillar"],
+          fireballChance: 0.48,
+          rollingChance: 0.36,
+          particleColor: "rgba(255,208,122,0.45)",
+          final: true,
+          countdown: 36
+        }
+      ];
+
+      const GROUND_Y = 430;
+      const PLAYER_X = 170;
+      const GRAVITY = 1800;
+
+      const game = {
+        state: "start",
+        stageIndex: 0,
+        stageDistance: 0,
+        totalDistance: 0,
+        score: 0,
+        shards: 0,
+        lives: 3,
+        nextSpawnIn: 0.8,
+        objects: [],
+        particles: [],
+        messageFlash: 0,
+        flashColor: "#fff5",
+        elapsed: 0,
+        collapseTime: 0,
+        finalShake: 0
+      };
+
+      const player = {
+        x: PLAYER_X,
+        y: GROUND_Y - 66,
+        w: 40,
+        h: 66,
+        vy: 0,
+        ducking: false,
+        slidingTimer: 0,
+        invuln: 0,
+        anim: 0
+      };
+
+      const keys = {
+        jumpBuffered: false,
+        duckHeld: false
+      };
+
+      function rand(min, max) {
+        return Math.random() * (max - min) + min;
+      }
+
+      function choice(arr) {
+        return arr[(Math.random() * arr.length) | 0];
+      }
+
+      function currentStage() {
+        return stageDefs[game.stageIndex];
+      }
+
+      function resetPlayer() {
+        player.y = GROUND_Y - 66;
+        player.w = 40;
+        player.h = 66;
+        player.vy = 0;
+        player.ducking = false;
+        player.slidingTimer = 0;
+        player.invuln = 0;
+        player.anim = 0;
+      }
+
+      function resetGame() {
+        game.state = "start";
+        game.stageIndex = 0;
+        game.stageDistance = 0;
+        game.totalDistance = 0;
+        game.score = 0;
+        game.shards = 0;
+        game.lives = 3;
+        game.objects = [];
+        game.particles = [];
+        game.nextSpawnIn = 0.8;
+        game.elapsed = 0;
+        game.collapseTime = stageDefs[3].countdown;
+        game.finalShake = 0;
+        resetPlayer();
+        showOnly("start");
+        updateUI();
+      }
+
+      function startGame() {
+        if (game.state === "play") return;
+        if (game.state === "start" || game.state === "win" || game.state === "lose") {
+          game.stageIndex = 0;
+          game.stageDistance = 0;
+          game.totalDistance = 0;
+          game.score = 0;
+          game.shards = 0;
+          game.lives = 3;
+          game.objects = [];
+          game.particles = [];
+          game.nextSpawnIn = 0.75;
+          game.elapsed = 0;
+          game.collapseTime = stageDefs[3].countdown;
+          game.finalShake = 0;
+          resetPlayer();
+        }
+        game.state = "play";
+        showOnly(null);
+        updateUI();
+      }
+
+      function pauseGame() {
+        if (game.state !== "play") return;
+        game.state = "pause";
+        showOnly("pause");
+        updateUI();
+      }
+
+      function resumeGame() {
+        if (game.state !== "pause") return;
+        game.state = "play";
+        showOnly(null);
+        updateUI();
+      }
+
+      function loseLife() {
+        if (player.invuln > 0) return;
+        game.lives--;
+        player.invuln = 1.5;
+        game.flashColor = "rgba(255,122,112,0.45)";
+        game.messageFlash = 0.25;
+        game.score = Math.max(0, game.score - 80);
+        if (game.lives <= 0) {
+          game.state = "lose";
+          ui.loseSummary.textContent = `The temple claimed you after ${Math.floor(game.totalDistance)}m with ${game.shards} relic shards recovered.`;
+          showOnly("lose");
+        }
+      }
+
+      function winGame() {
+        game.state = "win";
+        ui.winSummary.textContent = `You escaped ${Math.floor(game.totalDistance)}m of cursed ruins, recovered ${game.shards} relic shards, and finished with ${game.lives} lives remaining.`;
+        showOnly("win");
+      }
+
+      function showOnly(screen) {
+        ui.startScreen.classList.toggle("hidden", screen !== "start");
+        ui.pauseScreen.classList.toggle("hidden", screen !== "pause");
+        ui.winScreen.classList.toggle("hidden", screen !== "win");
+        ui.loseScreen.classList.toggle("hidden", screen !== "lose");
+      }
+
+      function jump() {
+        if (game.state !== "play") return;
+        const grounded = player.y + player.h >= GROUND_Y - 1;
+        if (grounded) {
+          player.vy = -670;
+          player.ducking = false;
+          player.slidingTimer = 0;
+          spawnBurst(player.x + 18, player.y + player.h - 4, 8, currentStage().bg.accent);
+        }
+      }
+
+      function setDuck(active) {
+        keys.duckHeld = active;
+        if (game.state !== "play") return;
+        const grounded = player.y + player.h >= GROUND_Y - 1;
+        if (active && grounded) {
+          player.ducking = true;
+          player.slidingTimer = 0.22;
+        }
+      }
+
+      function spawnBurst(x, y, count, color) {
+        for (let i = 0; i < count; i++) {
+          game.particles.push({
+            x, y,
+            vx: rand(-80, 90),
+            vy: rand(-140, -20),
+            life: rand(0.35, 0.7),
+            maxLife: 0.7,
+            color,
+            size: rand(2, 5)
+          });
+        }
+      }
+
+      function makeObject(type) {
+        const s = currentStage();
+        const baseX = canvas.width + rand(20, 120);
+
+        if (type === "spike") {
+          return {
+            type,
+            x: baseX,
+            y: GROUND_Y - 24,
+            w: 40 + (Math.random() < 0.35 ? 24 : 0),
+            h: 24,
+            harmful: true
+          };
+        }
+        if (type === "pillar") {
+          return {
+            type,
+            x: baseX,
+            y: GROUND_Y - 54,
+            w: 54,
+            h: 54,
+            harmful: true,
+            low: true
+          };
+        }
+        if (type === "tile") {
+          return {
+            type,
+            x: baseX,
+            y: GROUND_Y - 18,
+            w: 46,
+            h: 18,
+            harmful: true
+          };
+        }
+        if (type === "fireball") {
+          return {
+            type,
+            x: baseX,
+            y: rand(260, 380),
+            w: 30,
+            h: 30,
+            harmful: true,
+            vy: rand(-50, 70),
+            phase: rand(0, Math.PI * 2)
+          };
+        }
+        if (type === "rolling") {
+          return {
+            type,
+            x: baseX,
+            y: GROUND_Y - 44,
+            w: 44,
+            h: 44,
+            harmful: true,
+            rot: 0
+          };
+        }
+      }
+
+      function makeShard() {
+        return {
+          type: "shard",
+          x: canvas.width + rand(0, 80),
+          y: rand(250, 380),
+          w: 18,
+          h: 18,
+          harmful: false,
+          bob: rand(0, Math.PI * 2)
+        };
+      }
+
+      function spawnWave() {
+        const s = currentStage();
+        let hazardType = choice(s.obstacleWeights);
+
+        if (hazardType === "fireball" && Math.random() > s.fireballChance) hazardType = "spike";
+        if (hazardType === "rolling" && Math.random() > s.rollingChance) hazardType = "pillar";
+
+        const first = makeObject(hazardType);
+        game.objects.push(first);
+
+        if (Math.random() < 0.72) {
+          const shard = makeShard();
+          shard.x = first.x + rand(26, 86);
+          if (hazardType === "pillar") shard.y = GROUND_Y - 92;
+          if (hazardType === "spike") shard.y = GROUND_Y - 74;
+          if (hazardType === "rolling") shard.y = GROUND_Y - 94;
+          game.objects.push(shard);
+        }
+
+        if (currentStage().final && Math.random() < 0.38) {
+          const secondType = choice(["spike", "fireball", "rolling", "tile"]);
+          const second = makeObject(secondType);
+          second.x = first.x + rand(160, 240);
+          game.objects.push(second);
+        }
+
+        game.nextSpawnIn = s.spawnBase * rand(0.8, 1.18);
+      }
+
+      function nextStage() {
+        if (game.stageIndex >= stageDefs.length - 1) {
+          winGame();
+          return;
+        }
+        game.stageIndex++;
+        game.stageDistance = 0;
+        game.objects = [];
+        game.particles = [];
+        game.nextSpawnIn = 0.8;
+        game.flashColor = "rgba(255,232,163,0.35)";
+        game.messageFlash = 0.35;
+        if (currentStage().final) {
+          game.collapseTime = currentStage().countdown;
+        }
+      }
+
+      function rectsOverlap(a, b) {
+        return (
+          a.x < b.x + b.w &&
+          a.x + a.w > b.x &&
+          a.y < b.y + b.h &&
+          a.y + a.h > b.y
+        );
+      }
+
+      function playerRect() {
+        return {
+          x: player.x + 6,
+          y: player.y + 6,
+          w: player.w - 12,
+          h: player.h - 8
+        };
+      }
+
+      function update(dt) {
+        game.elapsed += dt;
+
+        if (game.state !== "play") return;
+
+        const s = currentStage();
+
+        game.stageDistance += s.speed * dt;
+        game.totalDistance += s.speed * dt * 0.05;
+        game.score += dt * 20 + s.speed * 0.01;
+
+        if (s.final) {
+          game.collapseTime -= dt;
+          game.finalShake = Math.max(0, game.finalShake - dt);
+          if (Math.random() < 0.12) {
+            game.finalShake = 6;
+          }
+          if (game.collapseTime <= 0) {
+            winGame();
+            return;
+          }
+        }
+
+        if (game.stageDistance >= s.length) {
+          nextStage();
+          return;
+        }
+
+        if (player.invuln > 0) player.invuln -= dt;
+        if (game.messageFlash > 0) game.messageFlash -= dt;
+
+        player.anim += dt * 10;
+        player.vy += GRAVITY * dt;
+        player.y += player.vy * dt;
+
+        const grounded = player.y + player.h >= GROUND_Y;
+        if (grounded) {
+          player.y = GROUND_Y - player.h;
+          player.vy = 0;
+        }
+
+        if (keys.duckHeld && grounded) {
+          player.ducking = true;
+          player.slidingTimer = Math.max(player.slidingTimer, 0.12);
+        } else {
+          player.slidingTimer -= dt;
+          if (player.slidingTimer <= 0) player.ducking = false;
+        }
+
+        if (player.ducking) {
+          player.h = 44;
+          player.w = 48;
+        } else {
+          player.h = 66;
+          player.w = 40;
+        }
+        if (grounded) player.y = GROUND_Y - player.h;
+
+        game.nextSpawnIn -= dt;
+        if (game.nextSpawnIn <= 0) spawnWave();
+
+        for (let i = game.objects.length - 1; i >= 0; i--) {
+          const o = game.objects[i];
+          o.x -= s.speed * dt;
+
+          if (o.type === "fireball") {
+            o.phase += dt * 5;
+            o.y += Math.sin(o.phase) * 120 * dt;
+          } else if (o.type === "rolling") {
+            o.rot += dt * 8;
+          } else if (o.type === "shard") {
+            o.bob += dt * 5;
+            o.y += Math.sin(o.bob) * 18 * dt;
+          }
+
+          if (o.x + o.w < -20) {
+            game.objects.splice(i, 1);
+            continue;
+          }
+
+          const pRect = playerRect();
+          const oRect = { x: o.x, y: o.y, w: o.w, h: o.h };
+
+          if (rectsOverlap(pRect, oRect)) {
+            if (o.type === "shard") {
+              game.shards++;
+              game.score += 125;
+              spawnBurst(o.x + o.w / 2, o.y + o.h / 2, 10, "#7ef5db");
+              game.objects.splice(i, 1);
+              continue;
+            }
+            if (o.harmful) {
+              loseLife();
+              spawnBurst(player.x + player.w / 2, player.y + player.h / 2, 12, "#ff9f72");
+              game.objects.splice(i, 1);
+              continue;
+            }
+          }
+        }
+
+        if (Math.random() < 0.18 + game.stageIndex * 0.03) {
+          game.particles.push({
+            x: canvas.width + rand(0, 20),
+            y: rand(40, GROUND_Y),
+            vx: rand(-120, -50),
+            vy: rand(-10, 20),
+            life: rand(0.6, 1.4),
+            maxLife: 1.4,
+            color: s.particleColor,
+            size: rand(2, 4)
+          });
+        }
+
+        for (let i = game.particles.length - 1; i >= 0; i--) {
+          const p = game.particles[i];
+          p.life -= dt;
+          p.x += p.vx * dt;
+          p.y += p.vy * dt;
+          if (p.life <= 0) game.particles.splice(i, 1);
+        }
+
+        updateUI();
+      }
+
+      function updateUI() {
+        const s = currentStage();
+        const progress = Math.max(0, Math.min(1, game.stageDistance / s.length));
+        ui.stageLabel.textContent = s.name;
+        ui.livesLabel.textContent = game.lives;
+        ui.scoreLabel.textContent = Math.floor(game.score);
+        ui.distanceLabel.textContent = `${Math.floor(game.totalDistance)}m`;
+        ui.shardLabel.textContent = game.shards;
+        ui.progressFill.style.width = `${progress * 100}%`;
+
+        if (game.state === "start") ui.statusText.textContent = "Ready";
+        else if (game.state === "pause") ui.statusText.textContent = "Paused";
+        else if (game.state === "win") ui.statusText.textContent = "Escaped";
+        else if (game.state === "lose") ui.statusText.textContent = "Fallen";
+        else ui.statusText.textContent = s.final ? `Collapse ${Math.ceil(game.collapseTime)}s` : "Running";
+
+        ui.progressText.textContent = s.final
+          ? "Final Escape Countdown"
+          : `${s.name} Progress`;
+      }
+
+      function drawPixelRect(x, y, w, h, fill, stroke) {
+        ctx.fillStyle = fill;
+        ctx.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h));
+        if (stroke) {
+          ctx.strokeStyle = stroke;
+          ctx.lineWidth = 2;
+          ctx.strokeRect(Math.round(x) + 1, Math.round(y) + 1, Math.round(w) - 2, Math.round(h) - 2);
+        }
+      }
+
+      function drawBackground() {
+        const s = currentStage();
+        const shakeX = currentStage().final && game.state === "play" ? rand(-game.finalShake, game.finalShake) : 0;
+        const shakeY = currentStage().final && game.state === "play" ? rand(-game.finalShake * 0.5, game.finalShake * 0.5) : 0;
+
+        ctx.save();
+        ctx.translate(shakeX, shakeY);
+
+        const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+        grad.addColorStop(0, s.bg.sky);
+        grad.addColorStop(0.65, s.bg.mid);
+        grad.addColorStop(1, s.bg.far);
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        drawSunOrGlow(s);
+        drawFarStructures(s);
+        drawGround(s);
+        drawTexture();
+
+        ctx.restore();
+      }
+
+      function drawSunOrGlow(s) {
+        const cx = canvas.width - 130;
+        const cy = 92;
+        ctx.fillStyle = s.final ? "rgba(255,180,90,0.18)" : "rgba(244,216,122,0.16)";
+        for (let i = 0; i < 4; i++) {
+          ctx.fillRect(cx - 30 - i * 10, cy - 30 - i * 10, 60 + i * 20, 60 + i * 20);
+        }
+        drawPixelRect(cx - 18, cy - 18, 36, 36, s.bg.accent, "rgba(0,0,0,.2)");
+      }
+
+      function drawFarStructures(s) {
+        const offset = (game.stageDistance * 0.12) % 240;
+        for (let i = -1; i < 6; i++) {
+          const x = i * 220 - offset;
+          ctx.fillStyle = "rgba(0,0,0,0.18)";
+          ctx.fillRect(x + 24, 170, 62, 170);
+          ctx.fillRect(x + 110, 200, 42, 140);
+          ctx.fillRect(x + 12, 160, 86, 18);
+          ctx.fillStyle = "rgba(255,255,255,0.05)";
+          ctx.fillRect(x + 30, 176, 10, 150);
+        }
+
+        const hillOffset = (game.stageDistance * 0.22) % 320;
+        ctx.fillStyle = "rgba(0,0,0,0.14)";
+        for (let i = -1; i < 5; i++) {
+          const x = i * 320 - hillOffset;
+          ctx.beginPath();
+          ctx.moveTo(x, 360);
+          ctx.lineTo(x + 80, 290);
+          ctx.lineTo(x + 170, 340);
+          ctx.lineTo(x + 290, 270);
+          ctx.lineTo(x + 320, 360);
+          ctx.closePath();
+          ctx.fill();
+        }
+      }
+
+      function drawGround(s) {
+        ctx.fillStyle = s.bg.ground;
+        ctx.fillRect(0, GROUND_Y, canvas.width, canvas.height - GROUND_Y);
+
+        const scroll = (game.stageDistance * 0.9) % 48;
+        for (let x = -48; x < canvas.width + 48; x += 48) {
+          drawPixelRect(x - scroll, GROUND_Y + 2, 46, 18, "rgba(255,255,255,0.05)");
+          drawPixelRect(x - scroll, GROUND_Y + 24, 46, 20, "rgba(0,0,0,0.08)");
+        }
+
+        ctx.fillStyle = "rgba(0,0,0,0.20)";
+        ctx.fillRect(0, GROUND_Y - 10, canvas.width, 12);
+
+        if (s.name === "Lava Hall" || s.final) {
+          for (let x = 0; x < canvas.width; x += 80) {
+            ctx.fillStyle = "rgba(255,109,47,0.12)";
+            ctx.fillRect(x + ((game.elapsed * 30 + x) % 40), GROUND_Y + 56, 28, 8);
+          }
+        }
+      }
+
+      function drawTexture() {
+        ctx.fillStyle = "rgba(255,255,255,0.03)";
+        for (let y = 0; y < canvas.height; y += 8) {
+          for (let x = (y % 16 === 0 ? 0 : 4); x < canvas.width; x += 16) {
+            ctx.fillRect(x, y, 2, 2);
+          }
+        }
+      }
+
+      function drawPlayer() {
+        const blink = player.invuln > 0 && Math.floor(player.invuln * 12) % 2 === 0;
+        if (blink) return;
+
+        const runOffset = Math.sin(player.anim * 1.8) * 2;
+        const px = player.x;
+        const py = player.y;
+
+        drawPixelRect(px + 10, py + 8, 18, 18, "#d7a96a", "#623f24");
+        drawPixelRect(px + 7, py + 26, player.ducking ? 30 : 24, player.ducking ? 12 : 24, "#6fc29d", "#214c3b");
+        drawPixelRect(px + 12, py + 14, 5, 5, "#22170e");
+        drawPixelRect(px + 22, py + 14, 5, 5, "#22170e");
+        drawPixelRect(px + 9, py + 44, 8, player.ducking ? 10 : 18 + runOffset, "#76502d");
+        drawPixelRect(px + 24, py + 44, 8, player.ducking ? 10 : 18 - runOffset, "#76502d");
+        drawPixelRect(px + 2, py + 28, 8, 10, "#d7a96a");
+        drawPixelRect(px + 30, py + 28, 8, 10, "#d7a96a");
+
+        drawPixelRect(px + 4, py + 4, 6, 6, "#d6d16d");
+        ctx.fillStyle = "rgba(0,0,0,0.18)";
+        ctx.fillRect(px + 8, py + player.h + 2, player.w - 8, 6);
+      }
+
+      function drawObjects() {
+        for (const o of game.objects) {
+          if (o.type === "spike") drawSpike(o);
+          else if (o.type === "pillar") drawPillar(o);
+          else if (o.type === "tile") drawCrackedTile(o);
+          else if (o.type === "fireball") drawFireball(o);
+          else if (o.type === "rolling") drawRollingStone(o);
+          else if (o.type === "shard") drawShard(o);
+        }
+      }
+
+      function drawSpike(o) {
+        for (let i = 0; i < o.w; i += 12) {
+          ctx.fillStyle = i % 24 === 0 ? "#d9d5c7" : "#b1a58a";
+          ctx.beginPath();
+          ctx.moveTo(o.x + i, o.y + o.h);
+          ctx.lineTo(o.x + i + 6, o.y);
+          ctx.lineTo(o.x + i + 12, o.y + o.h);
+          ctx.closePath();
+          ctx.fill();
+        }
+        ctx.fillStyle = "#604a29";
+        ctx.fillRect(o.x, o.y + o.h - 6, o.w, 6);
+      }
+
+      function drawPillar(o) {
+        drawPixelRect(o.x, o.y + 18, o.w, o.h - 18, "#8f7551", "#503d22");
+        drawPixelRect(o.x - 6, o.y + 6, o.w + 10, 14, "#a0845a", "#503d22");
+        drawPixelRect(o.x + 10, o.y, 18, 10, "#be9260", "#503d22");
+        ctx.fillStyle = "rgba(0,0,0,0.2)";
+        ctx.fillRect(o.x + 10, o.y + 24, 8, o.h - 24);
+      }
+
+      function drawCrackedTile(o) {
+        drawPixelRect(o.x, o.y, o.w, o.h, "#77634d", "#413225");
+        ctx.strokeStyle = "#281c13";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(o.x + 6, o.y + 4);
+        ctx.lineTo(o.x + 20, o.y + 10);
+        ctx.lineTo(o.x + 28, o.y + 6);
+        ctx.lineTo(o.x + 40, o.y + 15);
+        ctx.stroke();
+      }
+
+      function drawFireball(o) {
+        ctx.fillStyle = "rgba(255,170,100,0.18)";
+        ctx.fillRect(o.x - 8, o.y - 8, o.w + 16, o.h + 16);
+        drawPixelRect(o.x + 4, o.y, o.w - 8, o.h, "#ffd56c");
+        drawPixelRect(o.x, o.y + 6, o.w, o.h - 12, "#ff7f31");
+        drawPixelRect(o.x + 8, o.y + 12, o.w - 16, o.h - 20, "#b12612");
+      }
+
+      function drawRollingStone(o) {
+        ctx.save();
+        ctx.translate(o.x + o.w / 2, o.y + o.h / 2);
+        ctx.rotate(o.rot);
+        drawPixelRect(-o.w / 2, -o.h / 2, o.w, o.h, "#8a8071", "#43382d");
+        drawPixelRect(-6, -o.h / 2, 12, o.h, "rgba(0,0,0,0.12)");
+        drawPixelRect(-o.w / 2, -6, o.w, 12, "rgba(255,255,255,0.05)");
+        drawPixelRect(-5, -5, 10, 10, "#6b5f50");
+        ctx.restore();
+      }
+
+      function drawShard(o) {
+        ctx.save();
+        ctx.translate(o.x + o.w / 2, o.y + o.h / 2);
+        ctx.rotate(Math.PI / 4);
+        drawPixelRect(-9, -9, 18, 18, "#6fe8d3", "#1e5f59");
+        drawPixelRect(-4, -4, 8, 8, "#dffef7");
+        ctx.restore();
+      }
+
+      function drawParticles() {
+        for (const p of game.particles) {
+          const alpha = Math.max(0, p.life / p.maxLife);
+          ctx.fillStyle = p.color.replace(")", `, ${alpha})`).replace("rgba(", "rgba(");
+          if (p.color.startsWith("#")) {
+            ctx.fillStyle = p.color;
+            ctx.globalAlpha = alpha;
+          }
+          ctx.fillRect(p.x, p.y, p.size, p.size);
+          ctx.globalAlpha = 1;
+        }
+      }
+
+      function drawTopBanner() {
+        const s = currentStage();
+        ctx.fillStyle = "rgba(8,6,5,0.38)";
+        ctx.fillRect(16, 16, 320, 42);
+        ctx.strokeStyle = "rgba(240,208,138,0.35)";
+        ctx.strokeRect(17, 17, 318, 40);
+        ctx.fillStyle = "#f4e3bf";
+        ctx.font = "bold 18px Trebuchet MS";
+        ctx.fillText(s.name, 28, 42);
+
+        if (s.final && game.state === "play") {
+          ctx.fillStyle = "rgba(90,18,12,0.55)";
+          ctx.fillRect(canvas.width - 214, 16, 190, 42);
+          ctx.strokeStyle = "rgba(255,190,140,0.35)";
+          ctx.strokeRect(canvas.width - 213, 17, 188, 40);
+          ctx.fillStyle = "#ffd599";
+          ctx.fillText(`Collapse: ${Math.ceil(game.collapseTime)}s`, canvas.width - 196, 42);
+        }
+      }
+
+      function drawFlash() {
+        if (game.messageFlash <= 0) return;
+        ctx.fillStyle = game.flashColor;
+        ctx.globalAlpha = Math.min(0.55, game.messageFlash * 1.5);
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.globalAlpha = 1;
+      }
+
+      function render() {
+        drawBackground();
+        drawObjects();
+        drawPlayer();
+        drawParticles();
+        drawTopBanner();
+        drawFlash();
+
+        if (game.state === "start") {
+          renderIdlePrompt("Press Start to begin the expedition");
+        } else if (game.state === "pause") {
+          renderIdlePrompt("Paused");
+        }
+      }
+
+      function renderIdlePrompt(text) {
+        ctx.fillStyle = "rgba(0,0,0,0.18)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#f4e3bf";
+        ctx.font = "bold 26px Trebuchet MS";
+        ctx.textAlign = "center";
+        ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+        ctx.textAlign = "left";
+      }
+
+      let last = performance.now();
+      function loop(now) {
+        const dt = Math.min(0.033, (now - last) / 1000);
+        last = now;
+        update(dt);
+        render();
+        requestAnimationFrame(loop);
+      }
+
+      function handleKeyDown(e) {
+        if (e.code === "Space") {
+          e.preventDefault();
+          if (game.state === "start") startGame();
+          else if (game.state === "play") jump();
+          else if (game.state === "pause") resumeGame();
+          else if (game.state === "win" || game.state === "lose") startGame();
+        } else if (e.code === "ArrowDown") {
+          e.preventDefault();
+          setDuck(true);
+        } else if (e.code === "KeyP") {
+          e.preventDefault();
+          if (game.state === "play") pauseGame();
+          else if (game.state === "pause") resumeGame();
+        } else if (e.code === "KeyR") {
+          e.preventDefault();
+          startGame();
+        }
+      }
+
+      function handleKeyUp(e) {
+        if (e.code === "ArrowDown") {
+          e.preventDefault();
+          setDuck(false);
+        }
+      }
+
+      document.addEventListener("keydown", handleKeyDown);
+      document.addEventListener("keyup", handleKeyUp);
+
+      document.getElementById("startBtn").addEventListener("click", startGame);
+      document.getElementById("heroStartBtn").addEventListener("click", startGame);
+      document.getElementById("pauseBtn").addEventListener("click", () => game.state === "play" ? pauseGame() : resumeGame());
+      document.getElementById("heroPauseBtn").addEventListener("click", () => game.state === "play" ? pauseGame() : resumeGame());
+      document.getElementById("resumeBtn").addEventListener("click", resumeGame);
+
+      function restartFromUI() {
+        resetGame();
+        startGame();
+      }
+
+      document.getElementById("restartBtn").addEventListener("click", restartFromUI);
+      document.getElementById("heroRestartBtn").addEventListener("click", restartFromUI);
+      document.getElementById("pauseRestartBtn").addEventListener("click", restartFromUI);
+      document.getElementById("winRestartBtn").addEventListener("click", restartFromUI);
+      document.getElementById("loseRestartBtn").addEventListener("click", restartFromUI);
+
+      resetGame();
+      requestAnimationFrame(loop);
+    })();
+  </script>
+</body>
+</html>
